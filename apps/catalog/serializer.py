@@ -2,22 +2,10 @@ from rest_framework import serializers
 from .models import Category, Seller
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    children = serializers.SerializerMethodField()
+class CategoryChildSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ("id", "name", "image", "children")
-
-    def get_children(self, obj):
-        children = obj.children.all()
-        return [
-            {
-                "id": c.id,
-                "name": c.name,
-                "image": c.image.url if c.image else None
-            }
-            for c in children
-        ]
+        fields = ("id", "name", "image")
 
 
 class CategoryListSerializer(serializers.ModelSerializer):
@@ -27,11 +15,11 @@ class CategoryListSerializer(serializers.ModelSerializer):
 
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
-    children = CategoryListSerializer(many=True, read_only=True)
+    children = CategoryChildSerializer(many=True, read_only=True)
 
     class Meta:
         model = Category
-        fields = ("id", "name", "children")
+        fields = ("id", "name", "image", "children")
 
 
 class SellerSerializer(serializers.ModelSerializer):
