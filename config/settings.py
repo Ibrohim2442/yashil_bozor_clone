@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_spectacular',
     'django_filters',
+    'debug_toolbar',
 
     # Local apps
     'apps.users',
@@ -63,6 +64,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -160,3 +163,8 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]

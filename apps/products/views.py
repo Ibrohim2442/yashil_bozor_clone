@@ -19,4 +19,10 @@ class CategoryProductsView(generics.ListAPIView):
 
     def get_queryset(self):
         category_id = self.kwargs["category_id"]
-        return Product.objects.filter(category_id=category_id)
+        # return Product.objects.filter(category_id=category_id)
+        return (
+            Product.objects
+            .select_related("seller", "category")
+            .prefetch_related("images")
+            .filter(category_id=category_id)
+        )
