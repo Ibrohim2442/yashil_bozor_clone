@@ -28,5 +28,11 @@ class CategoryProductsView(generics.ListAPIView):
         )
 
 class ProductsListView(generics.ListAPIView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.filter(is_active=True).select_related("seller", "category").prefetch_related("images")
     serializer_class = ProductSerializer
+    filter_backends = [OrderingFilter]
+    filterset_class = ProductFilter
+
+    ordering_fields = ["price", "created_at"]
+    ordering = ["-created_at"]
+

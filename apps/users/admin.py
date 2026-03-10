@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from .models import User, UserProfile
+from .models import User, UserProfile, Favorite
+
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -38,3 +39,9 @@ class UserProfileAdmin(admin.ModelAdmin):
     def user_phone(self, obj):
         return obj.user.phone
     user_phone.short_description = "Phone"
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ("user", "product", "created_at")
+    list_filter = ("created_at",)
+    search_fields = ("user__phone", "product__name")

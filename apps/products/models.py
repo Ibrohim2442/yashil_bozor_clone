@@ -1,5 +1,7 @@
+from PIL.ImageQt import rgb
 from django.conf import settings
 from django.db import models
+from rest_framework.exceptions import ValidationError
 
 from apps.categories.models import Category
 
@@ -50,13 +52,13 @@ class Product(models.Model):
 
     category = models.ForeignKey(
         Category,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="products"
     )
 
     seller = models.ForeignKey(
         Seller,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="products"
     )
 
@@ -82,7 +84,10 @@ class Product(models.Model):
 
     delivery_days = models.PositiveIntegerField(default=3)
 
+    is_active = models.BooleanField(default=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -97,6 +102,14 @@ class Product(models.Model):
     def is_in_stock(self):
         return self.stock > 0
 
+    def clean(self):
+        if self.discount_price and self.discount_price >= self.price:
+            raise ValidationError('Discount price must be less than the original price.')
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(
@@ -108,29 +121,7 @@ class ProductImage(models.Model):
     is_main = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
         images = ProductImage.objects.filter(product=self.product)
         if images.count() == 1 and not self.is_main:
             self.is_main = True
-            super().save(update_fields=['is_main'])
-
-
-class Favorite(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="favorites"
-    )
-    product = models.ForeignKey(
-        Product,
-        on_delete=models.CASCADE,
-        related_name="favorites"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('user', 'product')
-
-    def __str__(self):
-        return f"{self.user} → {self.product}"
+        super().save(*args, **kwargs)

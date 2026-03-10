@@ -4,12 +4,12 @@ from .models import Product, ProductImage, Seller
 class SellerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Seller
-        fields = ("id", "name", "description")
+        fields = ("id", "name", "description", "logo")
 
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ("id", "image")
+        fields = ("id", "image", "is_main")
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -23,6 +23,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
+            "category",
             "price",
             "discount_price",
             "discount_percent",
