@@ -60,6 +60,9 @@ class Order(models.Model):
 
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f"Order #{self.id} - {self.user}"
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(
@@ -68,11 +71,18 @@ class OrderItem(models.Model):
         related_name="items"
     )
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="order_items")
-    quantity = models.PositiveIntegerField()
+    quantity = models.PositiveIntegerField(
+        validators=[MinValueValidator(1)]
+    )
     price = models.DecimalField(max_digits=12, decimal_places=2)
 
+    def save(self, *args, **kwargs):
+        if not self.price:
+            self.price = self.product.price
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return self.product.name
+        return f"{self.product.name} x {self.quantity}"
 
 class OrderItemReview(models.Model):
     order_item = models.OneToOneField(
