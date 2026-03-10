@@ -13,6 +13,7 @@ class Cart(models.Model):
         related_name="cart"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Cart of {self.user}"
@@ -26,9 +27,11 @@ class CartItem(models.Model):
     )
     product = models.ForeignKey(
         Product,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="cart_items"
     )
     quantity = models.PositiveIntegerField(default=1)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         constraints = [

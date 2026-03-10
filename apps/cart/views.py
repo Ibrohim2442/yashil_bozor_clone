@@ -17,7 +17,8 @@ class CartDetailView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        return get_or_create_cart(self.request.user)
+        cart = get_or_create_cart(self.request.user)
+        return Cart.objects.prefetch_related("items__product").get(id=cart.id)
 
 class AddToCartView(generics.CreateAPIView):
     serializer_class = CartItemSerializer
@@ -28,11 +29,9 @@ class AddToCartView(generics.CreateAPIView):
         context['cart'] = get_or_create_cart(self.request.user)
         return context
 
-class UpdateCartItemView(generics.UpdateAPIView):
+class CartItemDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
-    queryset = CartItem.objects.all()
 
-class RemoveCartItemView(generics.DestroyAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = CartItem.objects.all()
+    def get_queryset(self):
+        return CartItem.objects.filter(cart__user=self.request.user).select_related('cart', 'product')
