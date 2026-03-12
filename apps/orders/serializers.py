@@ -53,19 +53,19 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             'items'
         ]
 
-        def create(self, validated_data):
-            items_data = validated_data.pop('items')
-            order = Order.objects.create(**validated_data, user=self.context['request'].user, total_price=0)
+    def create(self, validated_data):
+        items_data = validated_data.pop('items')
+        order = Order.objects.create(**validated_data, user=self.context['request'].user, total_price=0)
 
-            total = 0
-            for item in items_data:
-                price = item['product'].price
-                OrderItem.objects.create(order=order, price=price, **item)
-                total += price * item['quantity']
+        total = 0
+        for item in items_data:
+            price = item['product'].price
+            OrderItem.objects.create(order=order, price=price, **item)
+            total += price * item['quantity']
 
-            order.total_price = total
-            order.save()
-            return order
+        order.total_price = total
+        order.save()
+        return order
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
