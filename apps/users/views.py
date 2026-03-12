@@ -4,8 +4,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
-from apps.users.models import User, UserProfile
-from apps.users.serializers import UserSerializer, UserProfileSerializer
+from apps.users.models import User, UserProfile, Favorite
+from apps.users.serializers import UserSerializer, UserProfileSerializer, FavoriteSerializer
 
 
 # Create your views here.
@@ -38,3 +38,19 @@ class UserProfileDetailUpdateView(generics.RetrieveUpdateAPIView):
     def get_serializer(self, *args, **kwargs):
         kwargs['partial'] = True
         return super().get_serializer(*args, **kwargs)
+
+class FavoriteListCreateView(generics.ListCreateAPIView):
+    serializer_class = FavoriteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Favorite.objects.filter(user=self.request.user)
+
+    # def perform_create(self, serializer):
+    #     serializer.save(user=self.request.user)
+
+class FavoriteDeleteView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Favorite.objects.filter(user=self.request.user)

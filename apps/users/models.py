@@ -71,7 +71,14 @@ class Favorite(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'product')
+        # unique_together = ('user', 'product')
+        constraints = [
+            models.UniqueConstraint(
+                fields=('user', 'product'),
+                name='to check user have unique product in favorite',
+                violation_error_message="You already added this product to favorites."
+            )
+        ]
 
     def __str__(self):
         return f"{self.user} → {self.product}"
